@@ -15,4 +15,8 @@ public class TextBuilder extends Builder {
     public void makeEnd(String end) {
         buffer.append("文档编写完毕，请阅读！\n");
     }
+
+    public String getResult() {
+        return null;
+    }
 }
