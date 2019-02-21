@@ -8,12 +8,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 
 public class AnnotationDemoTest {
     @Test
-    public void findUser() {
+    public void findUserByAnnotation() {
 
         SqlSessionFactory sessionFactory = null;
         SqlSession sqlSession = null;
