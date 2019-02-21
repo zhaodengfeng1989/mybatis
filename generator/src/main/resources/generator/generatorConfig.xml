@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--classPathEntry的作用是将location指定的jar或者zip包添加到MBG的运行环境中-->
+    <!--location指定要添加的jar包的全路径-->
+    <classPathEntry location="E:\mybatis\generator\src\main\resources\generator\mysql-connector-java-5.1.29.jar" />
+
+    <context id="malltuser" targetRuntime="MyBatis3">
+        <!--commentGenerator默认实现类是DefaultCommentGenerator-->
+        <!--属性suppressAllComments表示生成的代码中不包含任何注释-->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <!--jdbcConnection指定MBG使用JDBC连接数据库的信息-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://172.21.10.197:3306/cloud_data"
+                        userId="emall"
+                        password="emall">
+        </jdbcConnection>
+
+        <!--javaTypeResolver指定MBG根据数据表列类型查找对应的java类型的查找器-->
+        <!--forceBigDecimals指定是否强制使用BigDecimals,如果为false,则在JDBC类型为DECIMAL和NUMERIC类型进行Java类型转换时,根据位数和是否大于0去做转换-->
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--javaModelGenerator中,targetPackage指定生成的java模型类存放的包的位置,如果targetProject路径不存在,则不会创建该目录,也就是不会生成-->
+        <!--属性中enableSubPackages表示根据不同的schema(即不同的数据库)添加不同的子包-->
+        <!--属性中trimStrings表示会将数据库表中返回的字符串字段去掉空格-->
+        <javaModelGenerator targetPackage="com.zhaodf.model" targetProject="src\main\java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!--sqlMapGenerator中,targetPackage指定生成的mapper文件存放的包的位置,如果targetProject路径不存在,则不会创建该目录,也就是不会生成-->
+        <!--属性中enableSubPackages表示根据不同的schema(即不同的数据库)添加不同的子包-->
+        <sqlMapGenerator targetPackage="mappers"  targetProject="src\main\resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!--javaClientGenerator中,指定DAO接口部分的类型,在-->
+        <!--targetPackage指定生成的mapper文件存放的包的位置;如果targetProject路径不存在,则不会创建该目录,也就是不会生成-->
+        <!--属性中enableSubPackages表示根据不同的schema(即不同的数据库)添加不同的子包-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.zhaodf.dao"  targetProject="src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+        <!--table指定要生成对象的表名(tableName),数据库(schema)等,domainObjectName指定时,表示生成的类文件和mapper文件前缀是它-->
+        <!--property中,useActualColumnNames为false,则会根据列名来使用驼峰标识生成属性名称,如user_name会生成userName,如果为true,则使用列名作为属性名称-->
+        <!--generatedKey用来指定自增主键的列名等,根据不同的sqlStatement,在生成mapper文件的insert标签时,会增加selectKey标签.
+            identity为true,表示<selectKey>中的order顺序为after,在执行完insert后执行;
+            identity为false,表示<selectKey>中的order顺序为before,在执行insert前执行;-->
+        <!--ignoreColumn表示忽略表中该列,即不生成对应的对象属性-->
+        <!--columnOverride表示重写该列名,也可以重写该列的jdbc类型.
+            比如我想把mobile改成mobile1,那么生成的对象属性名称中也是以mobile1为标准的-->
+        <table schema="cloud_data" tableName="mallt_user" domainObjectName="MalltUser" >
+            <property name="useActualColumnNames" value="false"/>
+            <generatedKey column="ID" sqlStatement="MySql" identity="true" />
+            <columnOverride column="mobile" property="mobile1" />
+            <ignoreColumn column="email" />
+            <columnOverride column="email" jdbcType="CHAR" />
+        </table>
+
+    </context>
+</generatorConfiguration>
