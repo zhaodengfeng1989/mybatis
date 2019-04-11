@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 public class MyBatisDemoTest {
@@ -39,7 +40,7 @@ public class MyBatisDemoTest {
             MalltUser user = new MalltUser();
             user.setName("baixw");
             user.setMobile("18333828888");
-            user.setEmail("baixw@163.com");
+            user.setBirthday(new Date());
             malltUserDao.insert(user);
             sqlSession.commit();
         } catch (IOException e) {
