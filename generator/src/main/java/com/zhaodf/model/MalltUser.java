@@ -1,11 +1,15 @@
 package com.zhaodf.model;
 
+import java.util.Date;
+
 public class MalltUser {
     private Integer id;
 
     private String name;
 
-    private String mobile1;
+    private String mobile;
+
+    private Date birthday;
 
     public Integer getId() {
         return id;
@@ -23,11 +27,19 @@ public class MalltUser {
         this.name = name == null ? null : name.trim();
     }
 
-    public String getMobile1() {
-        return mobile1;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setMobile1(String mobile1) {
-        this.mobile1 = mobile1 == null ? null : mobile1.trim();
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 }

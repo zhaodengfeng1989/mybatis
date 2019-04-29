@@ -2,9 +2,8 @@ package com.zhaodf.dao;
 
 import com.zhaodf.model.MalltUser;
 import com.zhaodf.model.MalltUserExample;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface MalltUserMapper {
     long countByExample(MalltUserExample example);

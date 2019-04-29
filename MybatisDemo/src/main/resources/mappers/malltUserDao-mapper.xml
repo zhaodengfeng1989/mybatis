@@ -3,10 +3,331 @@
         PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 <mapper namespace="com.zhaodf.dao.MalltUserDao">
-    <select id="findMalltUserById" resultType="com.zhaodf.model.MalltUser" >
-      select * from mallt_user where id = #{id}
+    <cache />
+    <resultMap id="malltUserMap" type="com.zhaodf.model.MalltUserModel" >
+        <constructor>
+            <idArg javaType="java.lang.Integer" column="id"/>
+            <arg javaType="java.lang.String" column="name"/>
+            <arg javaType="java.lang.String" column="email"/>
+            <arg javaType="java.lang.String" column="mobile"/>
+            <arg javaType="java.util.Date" column="birthday"/>
+        </constructor>
+        <discriminator javaType="java.lang.Integer" column="flag">
+            <case value="1" resultType="MalltUserModel">
+                <association property="role" column="id" select="selectUserRoleBySelectNesting"/>
+            </case>
+            <case value="2" resultType="MalltUserModel">
+                <collection property="couseLst" javaType="java.util.ArrayList" column="id" ofType="com.zhaodf.model.MalltUserCourse" select="selectUserCourseBySelectNesting"/>
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <resultMap id="malltUserRoleMap" type="com.zhaodf.model.MalltUserRole">
+        <id property="id" column="roleid"/>
+        <result property="rolecode" column="rolecode"/>
+        <result property="roleName" column="rolename"/>
+    </resultMap>
+
+    <resultMap id="malltUserToRoleMap" type="com.zhaodf.model.MalltUserModel" >
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="birthday" column="birthday"/>
+        <association property="role" resultMap="malltUserRoleMap">
+        </association>
+    </resultMap>
+
+    <resultMap id="malltUserToRoleSelectMap" type="com.zhaodf.model.MalltUserModel" >
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="birthday" column="birthday"/>
+        <association property="role" column="id" select="selectUserRoleBySelectNesting">
+        </association>
+    </resultMap>
+
+    <!--collection集合查询使用select嵌套结果-->
+    <resultMap id="malltUserToCourseSelectMap" type="com.zhaodf.model.MalltUserModel" >
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="birthday" column="birthday"/>
+        <association property="role" column="id" select="selectUserRoleBySelectNesting"/>
+        <collection property="couseLst" javaType="java.util.ArrayList" column="id" ofType="com.zhaodf.model.MalltUserCourse" select="selectUserCourseBySelectNesting"/>
+    </resultMap>
+
+    <resultMap id="malltUserCourseMap" type="com.zhaodf.model.MalltUserCourse">
+        <id property="id" column="id"/>
+        <result property="userId" column="userid"/>
+        <result property="courseName" column="coursename"/>
+    </resultMap>
+
+    <!--collection集合的关联结果嵌套查询-->
+    <resultMap id="malltUserToCourseMap" type="com.zhaodf.model.MalltUserModel">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="birthday" column="birthday"/>
+        <association property="role" column="id" select="selectUserRoleBySelectNesting"/>
+        <collection property="couseLst" ofType="com.zhaodf.model.MalltUserCourse" resultMap="malltUserCourseMap"/>
+    </resultMap>
+
+    <!--使用sql标签和<include refid=""/>可以抽取sql语句，简化识别度-->
+    <sql id="insertSqlKey">
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name,
+            </if>
+            <if test="mobile!=null">
+                mobile,
+            </if>
+            <if test="email!=null">
+                email,
+            </if>
+            <if test="birthday!=null">
+                birthday,
+            </if>
+        </trim>
+    </sql>
+
+    <sql id="insertSqlValue">
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="mobile != null">
+                #{mobile},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectTime"   resultType="String" databaseId="mysql">
+        SELECT  NOW() FROM dual
     </select>
-    <insert id="insert" parameterType="com.zhaodf.model.MalltUser">
-        insert into mallt_user(name,mobile,email) values(#{name}, #{mobile}, #{email});
+
+    <select id="selectTime"   resultType="String" databaseId="oracle">
+        SELECT  'oralce'||to_char(sysdate,'yyyy-mm-dd hh24:mi:ss')  FROM dual
+    </select>
+
+    <!--select语句，结合<where>标签，可以免去字段拼接中and的处理麻烦-->
+    <select id="findMalltUserById" parameterType="MalltUserModel" resultMap="malltUserMap">
+        select * from mallt_user
+        <where>
+            <if test="id !=0 and id!=null">
+                and ID = #{id}
+            </if>
+            <if test="name!=null">
+                and name=#{name}
+            </if>
+        </where>
+    </select>
+
+    <!--select语句，代替where标签的另一种方案-->
+    <select id="findMalltUser" parameterType="com.zhaodf.model.MalltUserModel" resultType="com.zhaodf.model.MalltUserModel">
+        select * from mallt_user
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="id !=0 and id!=null">
+                and ID = #{id}
+            </if>
+            <if test="name!=null">
+                and name=#{name}
+            </if>
+        </trim>
+    </select>
+
+    <!--select语句，使用choose(when,otherwise)标签-->
+    <select id="findMalltUser2" parameterType="com.zhaodf.model.MalltUserModel" resultType="com.zhaodf.model.MalltUserModel">
+        select * from mallt_user
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <choose>
+                <when test="id !=0">
+                    and ID = #{id}
+                </when>
+                <otherwise>
+                    AND id= 9
+                </otherwise>
+            </choose>
+        </trim>
+    </select>
+
+    <!--联合查询结果集嵌套-->
+    <select id="selectUserRole" parameterType="com.zhaodf.model.MalltUserModel" resultMap="malltUserToRoleMap">
+        select m.id,m.name,m.MOBILE,m.EMAIL,m.BIRTHDAY,r.id as roleid,ur.rolecode,ur.rolename
+        from mallt_user m
+            LEFT JOIN mallt_user_role_relation r ON m.id=r.userId
+            LEFT JOIN mallt_user_role ur ON ur.rolecode=r.rolecode
+        WHERE m.ID=#{id}
+    </select>
+
+    <!--联合查询中嵌套select嵌套查询-->
+    <select id="findMalltUser3" parameterType="MalltUserModel" resultMap="malltUserToRoleSelectMap">
+        select * from mallt_user
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="id !=0 and id!=null">
+                and ID = #{id}
+            </if>
+            <if test="name!=null">
+                and name=#{name}
+            </if>
+        </trim>
+    </select>
+
+    <!--嵌套select结果查询-->
+    <select id="selectUserRoleBySelectNesting" parameterType="MalltUserModel" resultMap="malltUserRoleMap">
+        select ur.id as roleid,ur.rolecode,ur.rolename from mallt_user_role ur
+            LEFT JOIN mallt_user_role_relation r
+                on ur.rolecode=r.rolecode
+        WHERE r.userId=#{id}
+    </select>
+
+    <!--collection集合联合查询中嵌套select嵌套查询-->
+    <select id="findMalltUser4" parameterType="MalltUserModel" resultMap="malltUserToCourseSelectMap">
+        select * from mallt_user
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="id !=0 and id!=null">
+                and ID = #{id}
+            </if>
+            <if test="name!=null">
+                and name=#{name}
+            </if>
+        </trim>
+    </select>
+
+    <!--collection集合联合查询中嵌套select嵌套查询-->
+    <select id="selectUserCourseBySelectNesting" parameterType="MalltUserModel" resultMap="malltUserCourseMap">
+        select uc.id,uc.userid,uc.coursename
+        from mallt_user_course uc
+        WHERE uc.userId=#{id}
+    </select>
+
+    <!--collection集合嵌套结果查询-->
+    <select id="selectUserCourseByResultNesting" parameterType="MalltUserModel" resultMap="malltUserToCourseMap">
+        select u.ID,u.`NAME`,u.EMAIL,u.MOBILE,u.BIRTHDAY,
+            uc.id as courseid,uc.userid,uc.coursename
+        from mallt_user u LEFT JOIN mallt_user_course uc ON u.id=uc.userid
+        where u.ID=#{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zhaodf.model.MalltUserModel">
+        insert into mallt_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name,
+            </if>
+            <if test="mobile!=null">
+                mobile,
+            </if>
+            <if test="email!=null">
+                email,
+            </if>
+            <if test="birthday!=null">
+                birthday,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="mobile != null">
+                #{mobile},
+            </if>
+            <if test="email != null">
+                #{email},
+            </if>
+            <if test="birthday != null">
+                #{birthday},
+            </if>
+        </trim>
     </insert>
+
+    <!--使用sql标签进行语句重写-->
+    <insert id="insertMalltUser" parameterType="com.zhaodf.model.MalltUserModel">
+        insert into mallt_user
+        <include refid="insertSqlKey"/>
+        <include refid="insertSqlValue"/>
+    </insert>
+
+    <!--update语句(where,set)标签的使用-->
+    <update id="updateMalltUserById" parameterType="com.zhaodf.model.MalltUserModel">
+        update mallt_user
+        <set>
+            <if test="name!=null">
+                name=#{name},
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="birthday!=null">
+                birthday=#{birthday},
+            </if>
+        </set>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+    <!--update语句trim(where,set)标签的使用-->
+    <update id="updateMalltUser" parameterType="com.zhaodf.model.MalltUserModel">
+        update mallt_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name!=null">
+                name=#{name},
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="birthday!=null">
+                birthday=#{birthday},
+            </if>
+        </trim>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+    <delete id="deleteByIds">
+        delete from mallt_user
+        <where>
+            id in
+            <foreach collection="list" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+
+    <delete id="deleteByMap">
+        delete from mallt_user
+        <where>
+            id in
+            <foreach collection="ids123" open="(" close=")" separator="," item="ids">
+                #{ids}
+            </foreach>
+        </where>
+    </delete>
+
+    <delete id="deleteByArray">
+        delete from mallt_user
+        <where>
+            id in
+            <foreach collection="array" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </delete>
 </mapper>

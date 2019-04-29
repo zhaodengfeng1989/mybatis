@@ -1,9 +1,9 @@
 package com.zhaodf.model;
 
-public class MalltUserBook {
+public class MalltUserCourse {
     private String id;
     private String userId;
-    private String bookName;
+    private String courseName;
 
     public String getId() {
         return id;
@@ -21,11 +21,11 @@ public class MalltUserBook {
         this.userId = userId;
     }
 
-    public String getBookName() {
-        return bookName;
+    public String getCourseName() {
+        return courseName;
     }
 
-    public void setBookName(String bookName) {
-        this.bookName = bookName;
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 }

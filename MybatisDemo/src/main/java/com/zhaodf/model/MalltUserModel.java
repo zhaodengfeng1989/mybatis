@@ -1,16 +1,19 @@
 package com.zhaodf.model;
 
-import javax.management.relation.Role;
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
-public class MalltUserModel {
+public class MalltUserModel implements Serializable {
     private Integer id;
     private String name;
     private String email;
     private String mobile;
     private Date birthday;
-
+    private String sex;
     private MalltUserRole role;
+
+    private List<MalltUserCourse> couseLst;
 
     public MalltUserModel() {
     }
@@ -63,12 +66,28 @@ public class MalltUserModel {
         this.birthday = birthday;
     }
 
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
     public MalltUserRole getRole() {
         return role;
     }
 
     public void setRole(MalltUserRole role) {
         this.role = role;
+    }
+
+    public List<MalltUserCourse> getCouseLst() {
+        return couseLst;
+    }
+
+    public void setCouseLst(List<MalltUserCourse> couseLst) {
+        this.couseLst = couseLst;
     }
 
     public void init(){
