@@ -1,6 +1,3 @@
-import com.zhaodf.dao.MalltUserMapper;
-import com.zhaodf.model.MalltUser;
-import com.zhaodf.model.MalltUserExample;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
