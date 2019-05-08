@@ -8,10 +8,11 @@
     <properties resource="db-info.properties"></properties>
     <!--指定 MyBatis 所用日志的具体实现，未指定时将自动查找。-->
     <settings>
-        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="logImpl" value="LOG4J"/>
         <setting name="lazyLoadingEnabled" value="true"/>
         <setting name="aggressiveLazyLoading" value="false"/>
         <setting name="cacheEnabled" value="true"/>
+        <setting name="useGeneratedKeys" value="true"/>
     </settings>
 
     <typeAliases>
@@ -39,7 +40,7 @@
         </plugin>
     </plugins>
 
-    <environments default="product">
+    <environments default="development">
         <environment id="development">
             <!-- 事务管理器的配置,这个配置就是直接使用了 JDBC 的提交和回滚设置，它依赖于从数据源得到的连接来管理事务作用域-->
             <transactionManager type="JDBC"/>

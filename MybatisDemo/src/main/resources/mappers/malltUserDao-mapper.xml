@@ -219,6 +219,9 @@
     </select>
 
     <insert id="insert" parameterType="com.zhaodf.model.MalltUserModel">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            select  LAST_INSERT_ID() AS ID
+        </selectKey>
         insert into mallt_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name!=null">
@@ -251,7 +254,7 @@
     </insert>
 
     <!--使用sql标签进行语句重写-->
-    <insert id="insertMalltUser" parameterType="com.zhaodf.model.MalltUserModel">
+    <insert id="insertMalltUser" parameterType="com.zhaodf.model.MalltUserModel"  useGeneratedKeys="true" keyProperty="id">
         insert into mallt_user
         <include refid="insertSqlKey"/>
         <include refid="insertSqlValue"/>

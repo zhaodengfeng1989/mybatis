@@ -47,12 +47,13 @@ public class MyBatisDemoTest {
             sqlSession = sessionFactory.openSession();
             MalltUserDao malltUserDao = sqlSession.getMapper(MalltUserDao.class);
             MalltUserModel user = new MalltUserModel();
-            user.setName("dengxiap");
+            user.setName("zhaodx");
             user.setMobile("15311250559");
             user.setEmail("zhaodengfeng@163.com");
             user.setBirthday(new Date());
-            //malltUserDao.insert(user);
-            malltUserDao.insertMalltUser(user);
+            int id = malltUserDao.insert(user);
+            //int id = malltUserDao.insertMalltUser(user);
+            System.out.println(id);
             sqlSession.commit();
         } catch (IOException e) {
             e.printStackTrace();
